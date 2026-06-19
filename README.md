@@ -86,6 +86,22 @@ one device.
 | `client` | Bring your own configured `alexa-remote2` instance. |
 | `init` | Extra options passed straight to `alexa-remote2`'s `init`. |
 
+## Notes & gotchas
+
+- **Do Not Disturb silences announcements.** If a call returns `ok` but you hear
+  nothing, check whether the device has DND on — Amazon still accepts the command,
+  it just won't play. You can toggle it through the underlying client:
+  ```ts
+  const alexa = new AlexaNotifier(/* … */)
+  await alexa.connect()
+  alexa.raw.setDoNotDisturb('Bedroom', false, () => {}) // raw = full alexa-remote2 API
+  ```
+- **First login:** use the `proxy` flow on a **desktop browser** (a phone may
+  deep-link into the Alexa app), and open the exact `http://<ip>:<port>` URL it
+  prints — it must match `proxy.host`. After that, the saved session is reused.
+- `.raw` exposes the underlying `alexa-remote2` instance for anything outside this
+  facade (volumes, routines, smart-home, etc.).
+
 ## How is this different from alexa-remote2?
 
 `alexa-remote2` is a powerful, low-level, callback-based client exposing ~150

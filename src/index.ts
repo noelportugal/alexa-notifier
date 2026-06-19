@@ -213,6 +213,12 @@ export class AlexaNotifier {
     return this
   }
 
+  /** The underlying alexa-remote2 instance — for the full API beyond this facade. */
+  get raw(): AlexaClient {
+    if (!this.client) throw new Error('not connected — call connect() first')
+    return this.client
+  }
+
   /** List all known Alexa devices on the account. */
   async getDevices(): Promise<DeviceInfo[]> {
     await this.connect()
