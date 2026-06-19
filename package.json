@@ -1,0 +1,56 @@
+{
+  "name": "alexa-notifier",
+  "version": "1.0.0",
+  "description": "Speak, announce, notify, and set reminders on your Amazon Echo / Alexa devices — a small, modern, Promise-first, TypeScript notifier.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "alexa",
+    "amazon echo",
+    "notifier",
+    "announcement",
+    "text-to-speech",
+    "tts",
+    "reminders",
+    "smart home"
+  ],
+  "author": "Noel Portugal",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noelportugal/alexa-notifier.git"
+  },
+  "homepage": "https://github.com/noelportugal/alexa-notifier#readme",
+  "bugs": {
+    "url": "https://github.com/noelportugal/alexa-notifier/issues"
+  },
+  "dependencies": {
+    "alexa-remote2": "^8.0.4"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
