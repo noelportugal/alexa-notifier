@@ -7,6 +7,7 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   target: 'node18',
+  external: ['alexa-cookie2'],
   outExtension({ format }) {
     return { js: format === 'cjs' ? '.cjs' : '.js' }
   },
