@@ -22,6 +22,10 @@ export interface AlexaNotifierOptions {
   statePath?: string | false
   /** Use the interactive proxy login flow (handles MFA). `true`, or `{ host, port }`. */
   proxy?: boolean | { host?: string; port?: number }
+  /** Called with the proxy login URL when interactive sign-in is required. */
+  onProxyUrl?: (url: string) => void
+  /** Max time to wait for `connect()` (e.g. for interactive login). Default: no limit. */
+  connectTimeoutMs?: number
   /** Extra options passed straight through to alexa-remote2's `init`. */
   init?: Record<string, unknown>
   /** Bring your own pre-configured alexa-remote2 instance (also used for testing). */
@@ -115,6 +119,17 @@ function errMessage(e: unknown): string {
   return e instanceof Error ? e.message : String(e)
 }
 
+/** alexa-remote2 reports the proxy login prompt as an "error" — detect it. */
+export function isProxyPrompt(message: string): boolean {
+  return /open .*http.*browser|login to amazon|proxy/i.test(message)
+}
+
+/** Pull the first http(s) URL out of a message. */
+export function extractUrl(message: string): string | undefined {
+  const m = message.match(/https?:\/\/[^\s'"]+/)
+  return m ? m[0] : undefined
+}
+
 function defaultStatePath(): string {
   return join(homedir(), '.alexa-notifier', 'state.json')
 }
@@ -164,7 +179,34 @@ export class AlexaNotifier {
     client.on?.('cookie', () => this.saveState(client.cookieData ?? client.cookie))
 
     await new Promise<void>((resolve, reject) => {
-      client.init(initOptions, (err) => (err ? reject(err) : resolve()))
+      let settled = false
+      const done = (err?: Error) => {
+        if (settled) return
+        settled = true
+        if (timer) clearTimeout(timer)
+        err ? reject(err) : resolve()
+      }
+      const timer =
+        this.opts.connectTimeoutMs != null
+          ? setTimeout(() => done(new Error(`connect timed out after ${this.opts.connectTimeoutMs}ms`)), this.opts.connectTimeoutMs)
+          : null
+      if (timer && typeof timer.unref === 'function') timer.unref()
+
+      // Successful auth is signalled by the 'ready' event.
+      client.on?.('ready', () => done())
+
+      client.init(initOptions, (err) => {
+        if (!err) return done() // cookie/state path: authenticated immediately
+        const msg = err.message || String(err)
+        // Proxy mode: this "error" is just the prompt to open the login URL.
+        if (isProxyPrompt(msg)) {
+          const url = extractUrl(msg) ?? msg
+          if (this.opts.onProxyUrl) this.opts.onProxyUrl(url)
+          else console.log(`[alexa-notifier] Open this URL and sign in: ${url}`)
+          return // keep waiting for 'ready'
+        }
+        done(err)
+      })
     })
     this.saveState(client.cookieData ?? client.cookie)
     this.connected = true
