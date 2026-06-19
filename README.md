@@ -14,8 +14,8 @@ symmetric tools for both ecosystems.
 - 🔁 **Multi-device fan-out** — broadcast to many; one offline Echo never blocks the rest.
 - 🔐 **Login once** — auth state is persisted and reused automatically.
 
-> Uses [`alexa-remote2`](https://www.npmjs.com/package/alexa-remote2) only as the
-> transport. Unofficial — Amazon has no public API for this; behavior can change.
+> Built on [`alexa-remote2`](https://www.npmjs.com/package/alexa-remote2) — works
+> with your existing Amazon account, no Alexa skill or developer setup required.
 
 ## Install
 
