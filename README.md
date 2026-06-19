@@ -111,8 +111,8 @@ endpoints directly (`/api/devices-v2/device`, `/api/behaviors/preview`,
 The only hard part of Alexa automation is **login + token refresh**, which is
 exactly why this library makes it optional: pass a `cookie`/saved session and it
 works dependency-free, or install [`alexa-cookie2`](https://www.npmjs.com/package/alexa-cookie2)
-to enable the interactive `proxy` login. Unlike wrappers around `alexa-remote2`,
-the actual functionality here is its own small, self-contained code.
+to enable the interactive `proxy` login. The actual functionality is its own
+small, self-contained code — not a wrapper around a larger client.
 
 ## License
 
